@@ -33,9 +33,7 @@ conf_count = 0
 
 #print out each file found in the conf directory
 for conf_file in conf_files:
-    print "\n"
     print "("+str(conf_count)+")"+conf_file
-    print "\n"
     conf_count += 1
 
 #prompt for virtual host to remove
@@ -78,22 +76,22 @@ if confirm in yes:
 
         #iterate through the list of dictionary objects
         for record in records:
-      	    #access the record key and the nested name key
-            record_name = record.get("record").get("name")
-	
-	    #see if what you just found matches the sub domain you're looking for
-	    if record_name == subdomain:
-	        #if it is, access the nested id key and store it
-    	        record_id = record.get("record").get("id")
-	        break
-	
+            #access the record key and the nested name key
+            record_name = record['record']['name']
+    
+            #see if what you just found matches the sub domain you're looking for
+            if record_name == subdomain:
+                #if it is, access the nested id key and store it
+                record_id = record['record']['id']
+                break
+ 
         #if the variable has data (determined above)
         if record_id:
-	    #use DNSimple API to remove the record
-	    dns.delete_record(base_domain, record_id)
-	else:
-	    print "Error! No DNS record found for deletion."
-	    sys.exit(0)
+            #use DNSimple API to remove the record
+            dns.delete_record(base_domain, record_id)
+    else:
+        print "Error! No DNS record found for deletion."
+        sys.exit(0)
         
     #remove the conf file
     os.remove(del_file_location)
