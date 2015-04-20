@@ -8,7 +8,7 @@ import re
 import configparser
 
 if os.getuid() != 0:
-    print "This script requires \033[91msudo\033[0m to execute. Please run again wil evelated permissions!"
+    print "This script requires \033[91msudo\033[0m to execute. Please run again with evelated permissions!"
     sys.exit(1)
 
 #config file setup
