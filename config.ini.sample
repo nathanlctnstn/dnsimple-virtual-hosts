@@ -1,0 +1,11 @@
+[dnsimple]
+email_address=nathan@example.org
+api_token=YOUR DNSIMPLE API TOKEN
+
+[host]
+#include trailing slash
+site_root_base=/var/www/
+#include trailing slash
+conf_base=/etc/httpd/virtual-hosts/
+default_user=apache
+default_group=apache
