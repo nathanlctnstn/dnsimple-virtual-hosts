@@ -2,9 +2,14 @@
 
 import shutil
 import os
+import sys
 from dnsimple import DNSimple
 import re
 import configparser
+
+if os.getuid() != 0:
+    print "This script requires \033[91msudo\033[0m to execute. Please run again wil evelated permissions!"
+    sys.exit(1)
 
 #config file setup
 config = configparser.ConfigParser()
@@ -15,6 +20,7 @@ site_root_base = config['host']['site_root_base']
 conf_base = config['host']['conf_base']
 dnsimple_api_token = config['dnsimple']['api_token']
 dnsimple_email_address = config['dnsimple']['email_address']
+use_dnsimple = int(config['dnsimple']['use'])
 
 #directory where virtual host conf files are held
 conf_dir = conf_base
@@ -60,36 +66,39 @@ if confirm in yes:
     #determine the site root
     site_root = site_root_base+fqdn+"/"
 
-    #create DNSimple object
-    dns = DNSimple(email=dnsimple_email_address, api_token=dnsimple_api_token)
+    if use_dnsimple == 1:
+        #create DNSimple object
+        dns = DNSimple(email=dnsimple_email_address, api_token=dnsimple_api_token)
     
-    #read in all records of domain from dnsimple
-    records = dns.records(base_domain)
+        #read in all records of domain from dnsimple
+        records = dns.records(base_domain)
 
-    #declare variable for record it (to be determined below)
-    record_id = None
+        #declare variable for record it (to be determined below)
+        record_id = None
 
-    #iterate through the list of dictionary objects
-    for record in records:
-	#access the record key and the nested name key
-	record_name = record.get("record").get("name")
+        #iterate through the list of dictionary objects
+        for record in records:
+      	    #access the record key and the nested name key
+            record_name = record.get("record").get("name")
 	
-	#see if what you just found matches the sub domain you're looking for
-	if record_name == subdomain:
-	    #if it is, access the nested id key and store it
-    	    record_id = record.get("record").get("id")
-	    break
-
-    #if the variable has data (determined above)
-    if record_id:
-	#use DNSimple API to remove the record
-	dns.delete_record(base_domain, record_id)
-	#remove the conf file
-	os.remove(del_file_location)
-	#remove the site file structure and contents
-	shutil.rmtree(site_root)
-    else:
-	print "Error! No DNS record found."
+	    #see if what you just found matches the sub domain you're looking for
+	    if record_name == subdomain:
+	        #if it is, access the nested id key and store it
+    	        record_id = record.get("record").get("id")
+	        break
+	
+        #if the variable has data (determined above)
+        if record_id:
+	    #use DNSimple API to remove the record
+	    dns.delete_record(base_domain, record_id)
+	else:
+	    print "Error! No DNS record found for deletion."
+	    sys.exit(0)
+        
+    #remove the conf file
+    os.remove(del_file_location)
+    #remove the site file structure and contents
+    shutil.rmtree(site_root)
 
 else:
-    print "Invalid input... exiting!"
+    print "Aborting!"

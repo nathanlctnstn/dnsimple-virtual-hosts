@@ -1,6 +1,7 @@
 [dnsimple]
 email_address=nathan@example.org
 api_token=YOUR DNSIMPLE API TOKEN
+use=1
 
 [host]
 #include trailing slash

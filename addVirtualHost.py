@@ -7,6 +7,10 @@ from dnsimple import DNSimple
 from requests import get
 import configparser
 
+if os.getuid() != 0:
+    print "This script requires \033[91msudo\033[0m to execute. Please run again wil evelated permissions!"
+    sys.exit(1)
+
 #config file setup
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -18,12 +22,33 @@ default_user = config['host']['default_user']
 default_group = config['host']['default_group']
 dnsimple_api_token = config['dnsimple']['api_token']
 dnsimple_email_address = config['dnsimple']['email_address']
+use_dnsimple = int(config['dnsimple']['use'])
 
 #ip address of requesting server
 ip = get('http://api.ipify.org').text
 
-#domain components 
-base = raw_input('Enter the base domain name: ')
+if use_dnsimple == 1:
+    dns = DNSimple(email=dnsimple_email_address, api_token=dnsimple_api_token)
+
+    domains = dns.domains()
+    domainList = list()
+
+    print "==AVAILABLE DOMAINS=="   
+
+    counter = 1
+    for domain in domains:
+        domainList.append(domain['domain']['name'])
+        print str(counter)+")"+domain['domain']['name']
+        counter += 1
+    
+    domain_choice = int(raw_input('Enter number of base domain: '))
+    base = domainList[domain_choice-1]
+    
+else:    
+    #domain components 
+    base = raw_input('Enter the base domain name: ')
+
+#get subdomain (prefix)
 prefix = raw_input('Enter the domain prefix: ')
 fqdn = prefix+"."+base
 
@@ -61,10 +86,9 @@ if not os.path.exists(site_root):
     outfile.write("</VirtualHost>")
 
     outfile.close()
-
-    #create DNSimple object
-    dns = DNSimple(email=dnsimple_email_address, api_token=dnsimple_api_token)
-    #create a dictionary with record data
-    new_record = {'record_type' : 'A', 'name' : prefix, 'content' : ip}
-    #add the record
-    dns.add_record(base, new_record)
+    
+    if use_dnsimple == 1:
+        #create a dictionary with record data
+        new_record = {'record_type' : 'A', 'name' : prefix, 'content' : ip}
+        #add the record
+        dns.add_record(base, new_record)
