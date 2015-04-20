@@ -4,6 +4,7 @@ api_token=YOUR DNSIMPLE API TOKEN
 use=1
 
 [host]
+server_conf = /etc/httpd/conf/httpd.conf
 #include trailing slash
 site_root_base=/var/www/
 #include trailing slash
