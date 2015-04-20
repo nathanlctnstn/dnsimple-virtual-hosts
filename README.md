@@ -15,11 +15,9 @@ Deallocation includes:
 * Removal of config file
 * Removal of DNS record
 
-#### Preparation
-1. Create a <code>virtual-hosts</code> directory in your Apache/HTTPD root (ex. <code>/etc/httpd/virtual-hosts/</code>)
-2. At the bottom of your Apache/HTTPD config file (ex. <code>/etc/httpd/conf/httpd.conf</code>) add <code>IncludeOptional virtual-hosts/*.conf</code>
-
 #### Use
+The addVirtualHost.py script will check for the existance of the virtual host config file directory (conf_base in the conf.ini file) and for the inclusion of that directiory in your webserver configuration file (server_conf in the conf.ini file). If either of these are not found, they will be automatically created.
+
 Setup the config.ini file to your liking. These scripts can be used without the DNSimple API, that parameter needs to be set in the config.ini file.
 
 These scripts need to be run as <code>sudo</code> so they can modify files within <code>/etc/httpd/virtual-hosts</code>

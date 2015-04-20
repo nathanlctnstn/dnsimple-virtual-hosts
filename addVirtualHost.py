@@ -34,8 +34,10 @@ if not conf_line in read_file:
     read_file.close()
     open(server_conf, "a").write("\n#Include virtual host configuration files\n"+conf_line)
     append_file.close()
-    sys.exit(1)
-    
+
+if not os.path.exists(conf_base):
+    os.makedirs(conf_base)
+
 #ip address of requesting server
 ip = get('http://api.ipify.org').text
 
