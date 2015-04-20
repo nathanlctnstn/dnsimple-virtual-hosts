@@ -16,6 +16,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 #config.ini variables
+server_conf = config['host']['server_conf']
 site_root_base = config['host']['site_root_base']
 conf_base = config['host']['conf_base']
 default_user = config['host']['default_user']
@@ -24,6 +25,17 @@ dnsimple_api_token = config['dnsimple']['api_token']
 dnsimple_email_address = config['dnsimple']['email_address']
 use_dnsimple = int(config['dnsimple']['use'])
 
+#check variables
+conf_line = "IncludeOptional "+conf_base+"*.conf"
+read_file = open(server_conf)
+append_file = open(server_conf, "a")
+
+if not conf_line in read_file:
+    read_file.close()
+    open(server_conf, "a").write("\n#Include virtual host configuration files\n"+conf_line)
+    append_file.close()
+    sys.exit(1)
+    
 #ip address of requesting server
 ip = get('http://api.ipify.org').text
 
